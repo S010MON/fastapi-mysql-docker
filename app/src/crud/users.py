@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.src.database import models
 from app.src.schemas.users import User, UserCreate
 from app.src.core import auth
+from app.src.core.config import settings
 
 
 def get_user(db: Session, username: str) -> User:
@@ -50,7 +51,7 @@ def delete_user(db: Session, username: str) -> bool:
 def increment_failed_attempts(db: Session, username):
     user = get_user(db, username)
 
-    if user.failed_attempts > 3:
+    if user.failed_attempts > settings.MAX_PASSWORD_ATTEMTPS:
         set_user_disabled(db, username, True)
 
     db.execute(update(models.User)
