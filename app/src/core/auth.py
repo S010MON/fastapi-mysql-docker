@@ -42,6 +42,7 @@ def authenticate_user(db: Session, username: str, password: str) -> bool:
                             detail="User not found")
 
     if not verify_password(password, user.hashed_password):
+        users.increment_failed_attempts(db, user.username)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="User not found")
     return True

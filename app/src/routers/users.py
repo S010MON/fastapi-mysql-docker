@@ -53,14 +53,7 @@ async def update_user_password(user: UserUpdate,
 
 
 @router.delete("/api/user/", status_code=status.HTTP_200_OK)
-async def delete_user(user: UserCreate,
-                      db: Session = Depends(get_db),
-                      token: str = Depends(oauth2_scheme)):
-    authenticate_user(db, user.username, user.old_password)
-
-    user = users.get_user(db, user.username)
-    if not user:
-        raise NOT_FOUND_EXCEPTION
-
+async def delete_current_user(user: User = Depends(get_current_active_user),
+                              db: Session = Depends(oauth2_scheme)):
     users.delete_user(db, user.username)
     return {"detail": "user successfully deleted"}

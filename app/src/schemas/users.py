@@ -15,9 +15,9 @@ class UserUpdate(UserBase):
 
 
 class User(UserBase):
-
     id: int
     disabled: bool
+    failed_attempts: int
 
     class Config:
         orm_mode = True
