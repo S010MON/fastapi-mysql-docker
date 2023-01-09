@@ -2,12 +2,17 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from sqlalchemy.orm import Session
 
-from ..core.auth import oauth2_scheme, authenticate_user
+from ..core.auth import oauth2_scheme, authenticate_user, get_current_active_user
 from ..crud import users
 from ..schemas.users import User, UserCreate, UserUpdate
 from ..database.db_config import get_db
 
 router = APIRouter(tags=['users'])
+
+
+@router.get("/api/user/whoami", response_model=User, status_code=200)
+async def who_am_i(current_user: User = Depends(get_current_active_user)):
+    return current_user
 
 
 @router.post("/api/user/", response_model=User, status_code=200)
