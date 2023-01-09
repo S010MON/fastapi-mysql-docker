@@ -1,5 +1,3 @@
-import uvicorn
-
 from fastapi import FastAPI, Request, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
@@ -32,7 +30,7 @@ async def startup_event():
 
 @app.get("/", status_code=status.HTTP_200_OK)
 async def root(request: Request):
-    return {"msg": "coded law"}
+    return {"msg": "hello world"}
 
 
 @app.post("/api/user/", response_model=User, status_code=200)
