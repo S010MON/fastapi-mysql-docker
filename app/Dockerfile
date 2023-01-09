@@ -21,4 +21,4 @@ ADD . .
 WORKDIR .
 
 # Run the server
-CMD ["uvicorn", "app.src.main:app", "--host", "0.0.0.0", "--port", "5000"]
+CMD ["uvicorn", "app.src.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]

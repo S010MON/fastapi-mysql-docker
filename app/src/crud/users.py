@@ -1,3 +1,5 @@
+from sqlalchemy import update
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from app.src.database import models
 from app.src.schemas.users import User, UserCreate
@@ -21,9 +23,22 @@ def create_user(db: Session, user: UserCreate):
     return db_user
 
 
+def update_user_password(db: Session, user: UserCreate) -> bool:
+    hashed_password = auth.hash_password(user.password)
+    result = db.execute(update(models.User)
+                        .where(models.User.username == user.username)
+                        .values(hashed_password=hashed_password))
+    try:
+        db.commit()
+        return True
+    except SQLAlchemyError:
+        db.rollback()
+        return False
+
+
 def delete_user(db: Session, username: str) -> bool:
-    user = db.query(models.User)\
-        .filter(models.User.username == username)\
+    user = db.query(models.User) \
+        .filter(models.User.username == username) \
         .first()
     if not user:
         return False

@@ -9,6 +9,11 @@ class UserCreate(UserBase):
     password: str
 
 
+class UserUpdate(UserBase):
+    old_password: str
+    new_password: str
+
+
 class User(UserBase):
 
     id: int
