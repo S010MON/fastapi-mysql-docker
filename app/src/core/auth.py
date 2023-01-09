@@ -38,13 +38,16 @@ def authenticate_user(db: Session, username: str, password: str) -> bool:
     """
     user = users.get_user(db, username)
     if not user:
-        return False
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="User not found")
+
     if not verify_password(password, user.hashed_password):
-        return False
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="User not found")
     return True
 
 
-def create_access_token(data: dict):
+def create_access_token(data: dict) -> str:
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINS)
     to_encode.update({"exp": expire})
@@ -53,7 +56,7 @@ def create_access_token(data: dict):
 
 
 def get_current_user(db: Session = Depends(get_db),
-                     token: str = Depends(oauth2_scheme)):
+                     token: str = Depends(oauth2_scheme)) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -73,7 +76,7 @@ def get_current_user(db: Session = Depends(get_db),
     return user
 
 
-async def get_current_active_user(current_user: User = Depends(get_current_user)):
+async def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user

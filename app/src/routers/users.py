@@ -9,6 +9,9 @@ from ..database.db_config import get_db
 
 router = APIRouter(tags=['users'])
 
+NOT_FOUND_EXCEPTION = HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                    detail="User not found")
+
 
 @router.get("/api/user/whoami", response_model=User, status_code=200)
 async def who_am_i(current_user: User = Depends(get_current_active_user)):
@@ -32,8 +35,7 @@ async def get_one_user(username: str,
                        token: str = Depends(oauth2_scheme)):
     user = users.get_user(db, username)
     if user is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="User not found")
+        raise NOT_FOUND_EXCEPTION
     return user
 
 
@@ -41,16 +43,11 @@ async def get_one_user(username: str,
 async def update_user_password(user: UserUpdate,
                                db: Session = Depends(get_db),
                                token: str = Depends(oauth2_scheme)):
-    not_found_exception = HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                        detail="User not found")
-
-    authenticated = authenticate_user(db, user.username, user.old_password)
-    if not authenticated:
-        raise not_found_exception
+    authenticate_user(db, user.username, user.old_password)
 
     user = users.update_user_password(db, user)
     if user is None:
-        raise not_found_exception
+        raise NOT_FOUND_EXCEPTION
 
     return {"detail": "password successfully changed"}
 
@@ -59,16 +56,11 @@ async def update_user_password(user: UserUpdate,
 async def delete_user(user: UserCreate,
                       db: Session = Depends(get_db),
                       token: str = Depends(oauth2_scheme)):
-    not_found_exception = HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                        detail="User not found")
-
-    authenticated = authenticate_user(db, user.username, user.old_password)
-    if not authenticated:
-        raise not_found_exception
+    authenticate_user(db, user.username, user.old_password)
 
     user = users.get_user(db, user.username)
     if not user:
-        raise not_found_exception
+        raise NOT_FOUND_EXCEPTION
 
     users.delete_user(db, user.username)
     return {"detail": "user successfully deleted"}

@@ -9,3 +9,4 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     disabled = Column(Boolean, default=False)
+    failed_attempts = Column(Integer, default=0)
