@@ -14,9 +14,24 @@ services:
     volumes:
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
 
+    healthcheck:
+      test: "mysql $$MYSQL_DATABASE -u$$MYSQL_USER -p$$MYSQL_ROOT_PASSWORD -e 'SELECT 1;'"
+      interval: 1s
+      retries: 120
+
+  wait-for-db:
+    image: atkrad/wait4x
+    depends_on:
+      - db
+    command: tcp db:3306 -t 30s -i 250ms
+
   app:
     build: ./app           # Where the Dockerfile is stored
     restart: always
+
+    depends_on:
+      wait-for-db:
+        condition: service_completed_successfully
 
     volumes:
       - ./app:/app
@@ -26,3 +41,5 @@ services:
 
     ports:
       - "5000:5000"
+
+  
