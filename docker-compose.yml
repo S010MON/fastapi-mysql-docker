@@ -16,8 +16,8 @@ services:
 
     healthcheck:
       test: "mysql $$MYSQL_DATABASE -u$$MYSQL_USER -p$$MYSQL_ROOT_PASSWORD -e 'SELECT 1;'"
-      interval: 3s
-      retries: 5
+      interval: 10s
+      retries: 10
 
   wait-for-db:
     image: atkrad/wait4x
