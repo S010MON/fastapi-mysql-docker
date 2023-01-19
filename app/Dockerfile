@@ -1,9 +1,6 @@
 # Start from the official Base Image
 FROM python:3.10
 
-# Currently this just stops the container for a bit to let the DB setup ... need to improve this
-CMD ["sleep", "5"]
-
 # Update
 RUN apt-get -y update
 RUN apt-get -y install vim nano
@@ -21,4 +18,4 @@ ADD . .
 WORKDIR .
 
 # Run the server
-CMD ["uvicorn", "app.src.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
+CMD ["uvicorn", "app.src.main:app", "--host", "0.0.0.0", "--port", "5000"]
